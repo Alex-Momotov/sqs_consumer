@@ -1,0 +1,95 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>alex</groupId>
+  <artifactId>sqstesting</artifactId>
+  <version>1.0</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>aws-java-sdk-bom</artifactId>
+        <version>1.11.1000</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <artifactId>aws-java-sdk-sqs</artifactId>
+      <groupId>com.amazonaws</groupId>
+      <optional>false</optional>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <!-- Allows running "mvn exec:java" -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <mainClass>alex.App</mainClass>    
+          <arguments>foo bar baz</arguments>
+        </configuration>
+      </plugin>
+
+      <!-- configure maven-jar-plugin - adds main class name to jar manifest so we can run using "java -jar" -->
+      <plugin> 
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>alex.App</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Creates a fat jar that contains the app and all its dependencies. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.3</version>
+        <executions>
+          <execution>
+              <!-- Run shade goal on package phase -->
+              <phase>package</phase>
+              <goals>
+                <goal>shade</goal>
+              </goals>
+              <configuration>
+                <transformers>
+                  <!-- add Main-Class to manifest file -->
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>alex.App</mainClass>
+                </transformer>
+                </transformers>
+              </configuration>
+            </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>
